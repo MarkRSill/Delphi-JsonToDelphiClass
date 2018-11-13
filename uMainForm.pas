@@ -9,12 +9,12 @@ uses
   regularexpressions, generics.collections, Pkg.Json.Mapper, NetEncoding,
   FMX.Menus, FMX.Controls.Presentation, FMX.Edit, FMX.ConstrainedForm, REST.Client,
   uUpdate, System.Threading, uGitHub, FMX.Objects, uUpdateForm, SyncObjs,
-  FMX.ScrollBox;
+  FMX.ScrollBox, System.Actions, FMX.ActnList, FMX.StdActns;
 
-const JsonValidatorUrl = 'http://jsonlint.com';
+const
+  JsonValidatorUrl = 'http://jsonlint.com';
 
 type
-
   TMainForm = class(TConstrainedForm)
     {$REGION 'Form Designer Code'}
     Memo1: TMemo;
@@ -45,6 +45,10 @@ type
     Panel4: TPanel;
     MenuItem8: TMenuItem;
     btnGenerateUnit: TButton;
+    JSONActions: TActionList;
+    PrettyPrintAction: TAction;
+    JSONValidateAction: TAction;
+    EditVirtualKeyboard1: TVirtualKeyboard;
     procedure btnVisualizeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -62,8 +66,8 @@ type
     procedure tvKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
     procedure Panel1Resize(Sender: TObject);
-    procedure MenuItem8Click(Sender: TObject);
-    procedure btnOnlineJsonValidatorClick(Sender: TObject);
+    procedure PrettyPrintActionExecute(Sender: TObject);
+    procedure JSONValidateActionExecute(Sender: TObject);
     {$ENDREGION}
   private
     procedure DisableMenuItems;
@@ -143,11 +147,6 @@ begin
   FreeAndNil(FUpdateCheckEvent);
   FreeAndNil(jm);
   FreeAndNil(FCheckVersionResponse);
-end;
-
-procedure TMainForm.btnOnlineJsonValidatorClick(Sender: TObject);
-begin
-  MenuItem8Click(nil);
 end;
 
 procedure TMainForm.btnVisualizeClick(Sender: TObject);
@@ -282,7 +281,7 @@ begin
   end;
 end;
 
-procedure TMainForm.Memo1DblClick(Sender: TObject);
+procedure TMainForm.PrettyPrintActionExecute(Sender: TObject);
 var
   LTsl: TStringList;
   LJsonValue: TJSONValue;
@@ -300,6 +299,11 @@ begin
   finally
     LTsl.Free;
   end;
+end;
+
+procedure TMainForm.Memo1DblClick(Sender: TObject);
+begin
+  PrettyPrintAction.Execute;
 end;
 
 procedure TMainForm.MenuItem3Click(Sender: TObject);
@@ -332,7 +336,7 @@ begin
   end;
 end;
 
-procedure TMainForm.MenuItem8Click(Sender: TObject);
+procedure TMainForm.JSONValidateActionExecute(Sender: TObject);
 begin
   {$IFDEF MSWINDOWS}
     ShellExecute(0, 'OPEN', PChar(JsonValidatorUrl), '', '', SW_SHOWNORMAL);

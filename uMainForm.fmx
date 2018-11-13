@@ -1741,7 +1741,10 @@ object MainForm: TMainForm
         OnClick = btnVisualizeClick
       end
       object btnOnlineJsonValidator: TButton
+        Action = JSONValidateAction
         Align = Right
+        Enabled = True
+        ImageIndex = -1
         Margins.Right = 9.000000000000000000
         Position.X = 216.000000000000000000
         Position.Y = 6.000000000000000000
@@ -1749,8 +1752,7 @@ object MainForm: TMainForm
         Size.Height = 41.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 2
-        Text = 'Online JSON Validator'
-        OnClick = btnOnlineJsonValidatorClick
+        Text = 'Validate JSON string'
       end
       object btnExit: TButton
         Align = Right
@@ -1828,12 +1830,32 @@ object MainForm: TMainForm
     Left = 272
     Top = 32
     object MenuItem4: TMenuItem
-      Text = 'Pretty Print JSON string'
-      OnClick = Memo1DblClick
+      Action = PrettyPrintAction
+      Enabled = True
+      ImageIndex = -1
     end
     object MenuItem8: TMenuItem
+      Action = JSONValidateAction
+      Enabled = True
+      ImageIndex = -1
+    end
+  end
+  object JSONActions: TActionList
+    Left = 195
+    Top = 143
+    object PrettyPrintAction: TAction
+      Category = 'JSONEditor'
+      Text = 'Pretty Print JSON string'
+      OnExecute = PrettyPrintActionExecute
+    end
+    object JSONValidateAction: TAction
+      Category = 'JSONEditor'
       Text = 'Validate JSON string Online'
-      OnClick = MenuItem8Click
+      OnExecute = JSONValidateActionExecute
+    end
+    object EditVirtualKeyboard1: TVirtualKeyboard
+      Category = 'Edit'
+      Text = 'On-Screen Keyboard'
     end
   end
 end

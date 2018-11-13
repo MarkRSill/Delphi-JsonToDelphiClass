@@ -1,6 +1,11 @@
 program JsonToDelphiClass;
 
 uses
+  madExcept,
+  madLinkDisAsm,
+  madListHardware,
+  madListProcesses,
+  madListModules,
   System.StartUpCopy,
   FMX.Forms,
   uMainForm in 'uMainForm.pas' {MainForm},

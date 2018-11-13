@@ -16,6 +16,7 @@ const JsonValidatorUrl = 'http://jsonlint.com';
 type
 
   TMainForm = class(TConstrainedForm)
+    {$REGION 'Form Designer Code'}
     Memo1: TMemo;
     tv: TTreeView;
     StyleBook1: TStyleBook;
@@ -63,14 +64,13 @@ type
     procedure Panel1Resize(Sender: TObject);
     procedure MenuItem8Click(Sender: TObject);
     procedure btnOnlineJsonValidatorClick(Sender: TObject);
+    {$ENDREGION}
   private
-    { Private declarations }
     procedure DisableMenuItems;
     procedure VisualizeClass;
     procedure PrepareMenu;
     procedure DisableGuiElements;
   public
-    { Public declarations }
     jm: TPkgJsonMapper;
     FCheckVersionResponse: TObject;
     FChanged: boolean;
@@ -96,6 +96,55 @@ uses uSaveUnitForm,
   Posix.Stdlib;
 {$ENDIF POSIX}
 
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+  FApplicationStatus := 0;
+  FUpdateCheckEvent := TEvent.Create(nil, true, false, '');
+
+  self.Constraints.MinWidth := 1024;
+  self.Constraints.MinHeight := 560;
+
+  Caption := 'JsonToDelphiClass - ' + FloatToStr(ProgramVersion, PointDsFormatSettings) + ' | By Petar Georgiev';
+
+  jm := TPkgJsonMapper.Create(tv);
+
+  label1.Text := 'Checking for update...';
+
+  NewCheckForUpdateTask(
+    procedure(ARelease: TObject)
+    begin
+      FCheckVersionResponse := ARelease;
+      if FCheckVersionResponse is TReleaseClass then
+      begin
+        label1.StyleLookup := 'LabelLinkStyle';
+        label1.Text := 'Version ' + (FCheckVersionResponse as TReleaseClass).tag_name + ' is available! Click here to download!';
+        (label1.FindStyleResource('text') as TText).OnClick := label1Click;
+        label1.HitTest := true;
+      end
+      else
+        if FCheckVersionResponse is TErrorClass then
+        begin
+          label1.StyleLookup := 'LabelErrorStyle';
+          label1.Text := 'Error checking for new version: ' + (FCheckVersionResponse as TErrorClass).message;
+        end
+        else
+        begin
+          label1.StyleLookup := 'LabelGreenStyle';
+          label1.Text := 'Your version ' + FloatToStr(uUpdate.ProgramVersion, PointDsFormatSettings) + ' is up to date! For more information about JsonToDelphiClass click here!';
+          (label1.FindStyleResource('text') as TText).OnClick := label1Click;
+        end;
+        FUpdateCheckEvent.SetEvent;
+    end
+  );
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FUpdateCheckEvent);
+  FreeAndNil(jm);
+  FreeAndNil(FCheckVersionResponse);
+end;
+
 procedure TMainForm.btnOnlineJsonValidatorClick(Sender: TObject);
 begin
   MenuItem8Click(nil);
@@ -104,7 +153,8 @@ end;
 procedure TMainForm.btnVisualizeClick(Sender: TObject);
 begin
   if FChanged then
-    MessageDlg('You made changes to the structure. Do you want to load original class?', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0,
+    MessageDlg('You made changes to the structure. Do you want to load original class?', TMsgDlgType.mtWarning,
+      [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0,
       procedure(const AResult: TModalResult)
       begin
         if AResult = mrYes then
@@ -205,56 +255,6 @@ begin
         CanClose := true;
     end;
   end;
-end;
-
-procedure TMainForm.FormCreate(Sender: TObject);
-begin
-  FApplicationStatus := 0;
-  FUpdateCheckEvent := TEvent.Create(nil, true, false, '');
-
-  self.Constraints.MinWidth := 1024;
-  self.Constraints.MinHeight := 560;
-
-  Caption := 'JsonToDelphiClass - ' + FloatToStr(ProgramVersion, PointDsFormatSettings) + ' | By Petar Georgiev';
-
-  jm := TPkgJsonMapper.Create(tv);
-
-  label1.Text := 'Checking for update...';
-
-  NewCheckForUpdateTask(
-    procedure(ARelease: TObject)
-    begin
-      FCheckVersionResponse := ARelease;
-      if FCheckVersionResponse is TReleaseClass then
-      begin
-        label1.StyleLookup := 'LabelLinkStyle';
-        label1.Text := 'Version ' + (FCheckVersionResponse as TReleaseClass).tag_name + ' is available! Click here to download!';
-        (label1.FindStyleResource('text') as TText).OnClick := label1Click;
-        label1.HitTest := true;
-      end
-      else
-        if FCheckVersionResponse is TErrorClass then
-        begin
-          label1.StyleLookup := 'LabelErrorStyle';
-          label1.Text := 'Error checking for new version: ' + (FCheckVersionResponse as TErrorClass).message;
-        end
-        else
-        begin
-          label1.StyleLookup := 'LabelGreenStyle';
-          label1.Text := 'Your version ' + FloatToStr(uUpdate.ProgramVersion, PointDsFormatSettings) + ' is up to date! For more information about JsonToDelphiClass click here!';
-          (label1.FindStyleResource('text') as TText).OnClick := label1Click;
-        end;
-        FUpdateCheckEvent.SetEvent;
-    end
-  );
-
-end;
-
-procedure TMainForm.FormDestroy(Sender: TObject);
-begin
-  FreeAndNil(FUpdateCheckEvent);
-  FreeAndNil(jm);
-  FreeAndNil(FCheckVersionResponse);
 end;
 
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;

@@ -5,10 +5,11 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
-  FMX.Layouts, FMX.Memo;
+  FMX.Layouts, FMX.Memo, FMX.Controls.Presentation, FMX.ScrollBox;
 
 type
   TSaveUnitForm = class(TForm)
+    {$REGION 'Form Designer Code'}
     Memo1: TMemo;
     Panel1: TPanel;
     btnClose: TButton;
@@ -23,6 +24,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    {$ENDREGION}
   private
     { Private declarations }
   public
@@ -36,7 +38,8 @@ implementation
 
 {$R *.fmx}
 
-uses uMainForm;
+uses
+  uMainForm;
 
 procedure TSaveUnitForm.btnCloseClick(Sender: TObject);
 begin
@@ -47,7 +50,7 @@ procedure TSaveUnitForm.btnSaveClick(Sender: TObject);
 begin
   if sd.Execute then
   begin
-
+    memo1.Lines.SaveToFile(sd.FileName);
   end;
 end;
 

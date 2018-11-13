@@ -175,7 +175,7 @@ begin
   end
   else if JSONValue is TJSONArray then
     PrettyPrintArray(TJSONArray(JSONValue), OutputStrings, i = TJSONObject(JSONValue).Count - 1, LIdent)
-  else OutputStrings.add(StringOfChar(' ', LIdent) + JSONValue.ToString);
+  else OutputStrings.add(StringOfChar(' ', LIdent) + JSONValue.ToJSON);
 end;
 
 
@@ -249,15 +249,13 @@ var
   k: integer;
   LList: TStringList;
 begin
-
   LList := TStringList.Create;
   try
-
     LList.Add('unit ' + FUnitName + ';');
     LList.Add('');
     LList.Add('interface');
     LList.Add('');
-    LList.Add('uses'^M'  Generics.Collections, Rest.JSON;');
+    LList.Add('uses'+sLineBreak+'  Generics.Collections, Rest.JSON;');
     LList.Add('');
     LList.Add('type');
 
@@ -715,7 +713,7 @@ end;
 
 procedure TStubClass.SortFields;
 begin
-  FItems.Sort(FComparer);
+  // FItems.Sort(FComparer);
 end;
 
 function TStubClass.GetDeclarationPart: string;

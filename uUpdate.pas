@@ -1,7 +1,9 @@
 unit uUpdate;
 
 interface
-uses REST.Client, uGitHub, REST.JSON, JSON,
+
+uses
+  REST.Client, uGitHub, REST.JSON, JSON,
   IPPeerClient, SysUtils, System.Threading, Classes, Pkg.Json.Mapper;
 
 const
@@ -13,20 +15,21 @@ function InternalCheckForUpdate: TObject;
 procedure NewCheckForUpdateTask(AOnFinish: TProc<TObject>);
 
 implementation
-uses Math;
+
+uses
+  Math;
 
 function InternalCheckForUpdate: TObject;
 var
   LRestClient: TRESTClient;
   LRestRequest: TRESTRequest;
   LRestResponse: TRESTResponse;
-  LRelease,
-  LResult: TObject;
+  LRelease: TObject;
   LJsonArray: TJsonArray;
   LJsonValue: TJsonValue;
   LTag: double;
 begin
-  LResult := nil;
+  Result := nil;
   try
     LRestClient := TRESTClient.Create('');
     try
@@ -41,50 +44,38 @@ begin
 
           LRestRequest.Execute;
 
-          if LRestResponse.StatusCode = 200 then
-          begin
+          if LRestResponse.StatusCode = 200 then begin
             LJsonArray := TJSONObject.ParseJSONValue(LRestResponse.Content) as TJSONArray;
             try
-              for LJsonValue in LJsonArray do
-              begin
+              for LJsonValue in LJsonArray do begin
                 LRelease := TReleaseClass.FromJsonString(LJsonValue.ToJSON);
                 LTag := StrToFloat((LRelease as TReleaseClass).tag_name, PointDsFormatSettings);
-                if Math.CompareValue(LTag, ProgramVersion) = 1 then
-                begin
-                  LResult := LRelease;
+                if Math.CompareValue(LTag, ProgramVersion) = 1 then begin
+                  Result := LRelease;
                   break;
-                end
-                else
+                end else
                   LRelease.Free;
               end;
             finally
               LJsonArray.Free;
             end;
-          end
-          else
-            LResult := TErrorClass.FromJsonString(LRestResponse.Content);
-
+          end else
+            Result := TErrorClass.FromJsonString(LRestResponse.Content);
         finally
           LRestRequest.Free;
         end;
-
       finally
         LRestResponse.Free;
       end;
-
     finally
       LRestClient.Free;
     end;
-
   except
-    on e: Exception do
-    begin
-      LResult := TErrorClass.Create;
-      (LResult as TErrorClass).message := e.Message;
+    on e: Exception do begin
+      Result := TErrorClass.Create;
+      (Result as TErrorClass).message := e.Message;
     end;
   end;
-
-  result := LResult;
 end;
 
 procedure NewCheckForUpdateTask(AOnFinish: TProc<TObject>);

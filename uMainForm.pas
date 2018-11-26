@@ -32,7 +32,6 @@ type
     Panel3: TPanel;
     btnVisualize: TButton;
     btnOnlineJsonValidator: TButton;
-    btnExit: TButton;
     Label3: TLabel;
     Label4: TLabel;
     Edit2: TEdit;
@@ -49,11 +48,14 @@ type
     PrettyPrintAction: TAction;
     JSONValidateAction: TAction;
     EditVirtualKeyboard1: TVirtualKeyboard;
+    Panel5: TPanel;
+    rbDelphiJSON: TRadioButton;
+    rbGrijjy: TRadioButton;
+    rbXSuperObject: TRadioButton;
     procedure btnVisualizeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PreviewUnitClick(Sender: TObject);
-    procedure btnExitClick(Sender: TObject);
     procedure MainPopupMenuPopup(Sender: TObject);
     procedure tvDblClick(Sender: TObject);
     procedure Memo1DblClick(Sender: TObject);
@@ -74,6 +76,9 @@ type
     procedure VisualizeClass;
     procedure PrepareMenu;
     procedure DisableGuiElements;
+    function GetJsonLibrary: TJsonLibrary;
+  protected
+    property JsonLibrary: TJsonLibrary read GetJsonLibrary;
   public
     jm: TPkgJsonMapper;
     FCheckVersionResponse: TObject;
@@ -170,7 +175,6 @@ begin
   Memo1.Enabled := false;
   tv.Enabled := false;
   tv.PopupMenu := nil;
-  btnExit.Enabled := false;
   btnVisualize.Enabled := false;
   btnGenerateUnit.Enabled := false;
 end;
@@ -194,7 +198,7 @@ begin
   SaveUnitForm.sd.FileName := jm.DestinationUnitName + '.pas';
 
   SaveUnitForm.Memo1.DeleteSelection;
-  SaveUnitForm.Memo1.Text := jm.GenerateUnit;
+  SaveUnitForm.Memo1.Text := jm.GenerateUnit(JsonLibrary);
   SaveUnitForm.Caption := 'Preview Delphi Unit - ' + SaveUnitForm.sd.FileName;
 
   //  ShowModal bug - QC129552
@@ -205,11 +209,6 @@ begin
   SaveUnitForm.top := MainForm.Top + 25;
 
   SaveUnitForm.ShowModal;
-end;
-
-procedure TMainForm.btnExitClick(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -261,6 +260,16 @@ procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = 27 then
     close;
+end;
+
+function TMainForm.GetJsonLibrary: TJsonLibrary;
+begin
+  if rbDelphiJSON.IsChecked then
+    Result := jlDelphi
+  else if rbGrijjy.IsChecked then
+    Result := jlGrijjy
+  else
+    Result := jlXSuper;
 end;
 
 procedure TMainForm.Label1Click(Sender: TObject);

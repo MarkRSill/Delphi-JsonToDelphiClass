@@ -1543,8 +1543,8 @@ object MainForm: TMainForm
       TabOrder = 0
       OnDblClick = tvDblClick
       OnKeyDown = tvKeyDown
-      Viewport.Width = 329.000000000000000000
-      Viewport.Height = 503.000000000000000000
+      Viewport.Width = 333.000000000000000000
+      Viewport.Height = 507.000000000000000000
     end
     object Label3: TLabel
       Align = Top
@@ -1713,8 +1713,8 @@ object MainForm: TMainForm
       StyleLookup = 'Memo1Style1'
       TabOrder = 0
       OnDblClick = Memo1DblClick
-      Viewport.Width = 637.000000000000000000
-      Viewport.Height = 428.000000000000000000
+      Viewport.Width = 657.000000000000000000
+      Viewport.Height = 448.000000000000000000
     end
     object Panel3: TPanel
       Align = Bottom
@@ -1731,9 +1731,9 @@ object MainForm: TMainForm
       object btnVisualize: TButton
         Align = Right
         Margins.Right = 9.000000000000000000
-        Position.X = 482.000000000000000000
+        Position.X = 337.000000000000000000
         Position.Y = 6.000000000000000000
-        Size.Width = 80.000000000000000000
+        Size.Width = 63.000000000000000000
         Size.Height = 41.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
@@ -1746,33 +1746,22 @@ object MainForm: TMainForm
         Enabled = True
         ImageIndex = -1
         Margins.Right = 9.000000000000000000
-        Position.X = 216.000000000000000000
+        Position.X = 201.000000000000000000
         Position.Y = 6.000000000000000000
-        Size.Width = 144.000000000000000000
+        Size.Width = 127.000000000000000000
         Size.Height = 41.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 2
         Text = 'Validate JSON string'
       end
-      object btnExit: TButton
-        Align = Right
-        Position.X = 571.000000000000000000
-        Position.Y = 6.000000000000000000
-        Size.Width = 80.000000000000000000
-        Size.Height = 41.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 3
-        Text = 'Exit'
-        OnClick = btnExitClick
-      end
       object Panel4: TPanel
         Align = Client
         Margins.Right = 6.000000000000000000
-        Size.Width = 204.000000000000000000
+        Size.Width = 189.000000000000000000
         Size.Height = 41.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'Panel4Style1'
-        TabOrder = 6
+        TabOrder = 5
         object Label5: TLabel
           Position.X = 3.000000000000000000
           Position.Y = -1.000000000000000000
@@ -1783,6 +1772,7 @@ object MainForm: TMainForm
         end
         object Edit2: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
           Text = 'RootUnit'
           Position.X = 3.000000000000000000
@@ -1795,14 +1785,47 @@ object MainForm: TMainForm
       object btnGenerateUnit: TButton
         Align = Right
         Margins.Right = 9.000000000000000000
-        Position.X = 369.000000000000000000
+        Position.X = 555.000000000000000000
         Position.Y = 6.000000000000000000
-        Size.Width = 104.000000000000000000
+        Size.Width = 87.000000000000000000
         Size.Height = 41.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
         Text = 'Preview Unit'
         OnClick = PreviewUnitClick
+      end
+      object Panel5: TPanel
+        Align = Right
+        Margins.Right = 6.000000000000000000
+        Position.X = 409.000000000000000000
+        Position.Y = 6.000000000000000000
+        Size.Width = 140.000000000000000000
+        Size.Height = 41.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'Panel4Style1'
+        TabOrder = 6
+        object rbDelphiJSON: TRadioButton
+          GroupName = 'JsonLib'
+          IsChecked = True
+          Position.X = 10.000000000000000000
+          Position.Y = -5.000000000000000000
+          TabOrder = 2
+          Text = 'Delphi JSON'
+        end
+        object rbGrijjy: TRadioButton
+          GroupName = 'JsonLib'
+          Position.X = 10.000000000000000000
+          Position.Y = 11.000000000000000000
+          TabOrder = 1
+          Text = 'Grijjy Foundation'
+        end
+        object rbXSuperObject: TRadioButton
+          GroupName = 'JsonLib'
+          Position.X = 10.000000000000000000
+          Position.Y = 27.000000000000000000
+          TabOrder = 0
+          Text = 'XSuperObject'
+        end
       end
     end
     object Label4: TLabel

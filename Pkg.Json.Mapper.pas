@@ -11,7 +11,8 @@ type
 
   EJsonMapper = class(Exception);
 
-  TJsonType = (jtUnknown, jtObject, jtArray, jtString, jtTrue, jtFalse, jtNumber, jtDate, jtDateTime, jtBytes);
+  TJsonType = (jtUnknown, jtObject, jtArray, jtString, jtTrue, jtFalse, jtInteger, jtInt64, jtExtended,
+    jtUnixTimestamp, jtDate, jtDateTime, jtBytes);
 
   TStubClass = class;
 
@@ -94,8 +95,9 @@ type
     FUnitName: string;
     procedure SetUnitName(const Value: string);
   protected
-    function  GetJsonType(AJsonValue: TJsonValue): TJsonType;
-    function  GetFirstArrayItem(AJsonValue: TJsonValue): TJsonValue;
+    function GetJsonType(AJsonValue: TJsonValue; CurrentType: TJsonType = jtUnknown): TJsonType;
+    function GetJsonNumericType(AJsonValue: TJsonValue; CurrentType: TJsonType = jtUnknown): TJsonType;
+    function GetFirstArrayItem(AJsonValue: TJsonValue): TJsonValue;
     procedure ProcessJsonObject(AJsonValue: TJsonValue; AParentClass: TStubClass);
     procedure ClearClasses;
     procedure InternalFormatTreeViewFields(AItem: TTreeViewItem);
@@ -246,7 +248,7 @@ begin
             TStubArrayField.Create(AParentClass, LJsonPair.JsonString.Value, LJsonType2, LClass);
         end;
       end;
-      jtNumber,
+      jtInteger, jtInt64, jtUnixTimestamp, jtExtended,
       jtString,
       jtDate,
       jtDateTime,
@@ -434,40 +436,129 @@ begin
     Result := Format('%s_%0.3d', [ASuggestedClassName, LMax]);
 end;
 
-function TPkgJsonMapper.GetJsonType(AJsonValue: TJsonValue): TJsonType;
+function TPkgJsonMapper.GetJsonType(AJsonValue: TJsonValue; CurrentType: TJsonType = jtUnknown): TJsonType;
 var
   LJsonString: TJSONString;
 begin
   if AJsonValue is TJSONObject then
     Result := jtObject
-  else
-    if AJsonValue is TJSONArray then
-      Result := jtArray
+  else if AJsonValue is TJSONArray then
+    Result := jtArray
+  else if (AJsonValue is TJSONNumber) then
+    Result := GetJsonNumericType(AJsonValue, CurrentType) // jtNumber
+  else if AJsonValue is TJSONTrue then
+    Result := jtTrue
+  else if  AJsonValue is TJSONFalse then
+    Result := jtFalse
+  else if AJsonValue is TJSONString then begin
+    LJsonString := (AJsonValue as TJSONString);
+    if TRegEx.IsMatch(LJsonString.Value, '^([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])(T| )' +
+      '(2[0-3]|[01][0-9]):?([0-5][0-9]):?([0-5][0-9])(Z|-[0-2][0-9]:[0-5][0-9])$') then
+      Result := jtDateTime
+    else if TRegEx.IsMatch(LJsonString.Value, '^([0-9]{4})(-?)(1[0-2]|0[1-9])\2(3[01]|0[1-9]|[12][0-9])$') then
+      Result := jtDate
     else
-      if (AJsonValue is TJSONNumber) then
-        Result := jtNumber
-      else
-        if AJsonValue is TJSONTrue then
-          Result := jtTrue
-        else
-          if  AJsonValue is TJSONFalse then
-            Result := jtFalse
-          else
-            if AJsonValue is TJSONString then
-            begin
-              LJsonString := (AJsonValue as TJSONString);
-              if TRegEx.IsMatch(LJsonString.Value, '^([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])(T| )' +
-                '(2[0-3]|[01][0-9]):?([0-5][0-9]):?([0-5][0-9])(Z|-[0-2][0-9]:[0-5][0-9])$') then
-                // ^([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])(T| )(2[0-3]|[01][0-9]):?([0-5][0-9]):?([0-5][0-9])$
-                Result := jtDateTime
-              else
-                if TRegEx.IsMatch(LJsonString.Value, '^([0-9]{4})(-?)(1[0-2]|0[1-9])\2(3[01]|0[1-9]|[12][0-9])$') then
-                  Result := jtDate
-                else
-                  Result := jtString
-            end
-            else
-              Result := jtUnknown;
+      Result := jtString
+  end else
+    Result := jtUnknown;
+end;
+
+function TPkgJsonMapper.GetJsonNumericType(AJsonValue: TJsonValue; CurrentType: TJsonType = jtUnknown): TJsonType;
+
+  function IsFloat(Source: string): Integer;
+  var
+    TReal: Double;
+    E: Integer;
+  begin
+    Source := Trim(Source);
+    Val(Source, TReal, E);
+    if E = 0 then
+      Result := 1
+    else
+      Result := 0;
+
+    if (Result = 1) and (Pos('.', Source) = 0) then
+      Result := 2; //definite maybe
+
+    if (Result = 2) and (TReal > 2147483640.0) then
+      Result := 0;
+  end;
+
+  function IsInteger(Source: string): Boolean;
+  var
+    TInt: Integer;
+    E: Integer;
+  begin
+    Source := Trim(Source);
+    Result := Pos('.', Source) = 0;
+    if Result then begin
+      Val(Source, TInt, E);
+      if TInt=1 then begin end;//Removes warning.
+      Result := (E = 0);
+    end;
+  end;
+
+  function IsInt64(Source: string): Boolean;
+  var
+    Value: Int64;
+  begin
+    Value := StrToInt64Def(Source, Low(Int64));
+    Result := (Value > Low(Int64)) and (Value > High(Integer));
+  end;
+
+  function IsUnixTimestamp(Source: string): Boolean;
+  //  473385600  473385600000 = January 1, 1985 12:00:00 AM
+  // 2556141803 2556141803000 = December 31, 2050 11:23:23 PM
+  var
+    Value: Int64;
+  begin
+    Value := StrToInt64Def(Source, Low(Int64));
+    Result := ((Value > 473385600000) and (Value < 2556141803000));
+  end;
+
+var
+  intTemp: Integer;
+  fieldData: string;
+begin
+  Result := CurrentType;
+  if Result = jtExtended then
+    Exit;
+
+  // detect type from simplest to most complex = jtInteger, jtInt64, jtUnixTimestamp, jtExtended
+
+  fieldData := AJsonValue.ToString;
+
+  if (Result in [jtUnknown, jtInteger]) and (Result <> jtExtended) then
+  try
+    if IsInt64(fieldData) then
+      Result  := jtInt64
+    else
+    if IsInteger(fieldData) then
+      Result  := jtInteger;
+  except
+    Result  := jtUnknown;
+  end;
+
+  if Result in [jtUnknown, jtInteger, jtExtended] then
+  try
+    case IsFloat(fieldData) of
+      0: Result := jtUnknown; //definetly not a float
+      1: if Result in [jtUnknown, jtInteger] then
+        Result := jtExtended;
+      2: if Result = jtUnknown then
+        Result := jtInteger;
+    end;
+  except
+    if Result = jtExtended then
+      Result  := jtUnknown;
+  end;
+
+  if (Result = jtInt64) and IsUnixTimestamp(fieldData) then
+    Result := jtUnixTimestamp;
+
+  if Result = jtUnknown then
+    Result := jtExtended;
+  // jtInteger, jtInt64, jtExtended, jtUnixTimestamp
 end;
 
 procedure TPkgJsonMapper.InternalFormatTreeViewFields(AItem: TTreeViewItem);
@@ -858,7 +949,10 @@ begin
     jtString: Result := 'string';
     jtTrue,
     jtFalse: Result := 'Boolean';
-    jtNumber: Result := 'Extended';
+    jtInteger: Result := 'Integer';
+    jtInt64: Result := 'Int64';
+    jtUnixTimestamp: Result := 'TDateTime'; //TODO: How to switch based on Library
+    jtExtended: Result := 'Extended';
     jtDate: Result := 'TDate';
     jtDateTime: Result := 'TDateTime';
     jtBytes: Result := 'Byte';

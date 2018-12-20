@@ -1543,8 +1543,8 @@ object MainForm: TMainForm
       TabOrder = 0
       OnDblClick = tvDblClick
       OnKeyDown = tvKeyDown
-      Viewport.Width = 333.000000000000000000
-      Viewport.Height = 507.000000000000000000
+      Viewport.Width = 329.000000000000000000
+      Viewport.Height = 503.000000000000000000
     end
     object Label3: TLabel
       Align = Top
@@ -1713,8 +1713,8 @@ object MainForm: TMainForm
       StyleLookup = 'Memo1Style1'
       TabOrder = 0
       OnDblClick = Memo1DblClick
-      Viewport.Width = 657.000000000000000000
-      Viewport.Height = 448.000000000000000000
+      Viewport.Width = 637.000000000000000000
+      Viewport.Height = 428.000000000000000000
     end
     object Panel3: TPanel
       Align = Bottom
@@ -1744,6 +1744,7 @@ object MainForm: TMainForm
         Action = JSONValidateAction
         Align = Right
         Enabled = True
+        Images = ImageList1
         ImageIndex = -1
         Margins.Right = 9.000000000000000000
         Position.X = 201.000000000000000000
@@ -1852,6 +1853,11 @@ object MainForm: TMainForm
   object MemoPopupMenu: TPopupMenu
     Left = 272
     Top = 32
+    object miLoadJSON: TMenuItem
+      Action = LoadJSONAction
+      Enabled = True
+      ImageIndex = -1
+    end
     object MenuItem4: TMenuItem
       Action = PrettyPrintAction
       Enabled = True
@@ -1863,7 +1869,17 @@ object MainForm: TMainForm
       ImageIndex = -1
     end
   end
+  object OpenDialog: TOpenDialog
+    DefaultExt = 'json'
+    Filter = 
+      'JSON Files|*.json|JSON Files|*.jsn|JSON Text Files|*.txt|Any tex' +
+      't file|*.*'
+    Title = 'Load JSON File'
+    Left = 192
+    Top = 256
+  end
   object JSONActions: TActionList
+    Images = ImageList1
     Left = 195
     Top = 143
     object PrettyPrintAction: TAction
@@ -1880,5 +1896,16 @@ object MainForm: TMainForm
       Category = 'Edit'
       Text = 'On-Screen Keyboard'
     end
+    object LoadJSONAction: TAction
+      Category = 'JSONEditor'
+      Text = 'Load JSON'
+      OnExecute = LoadJSONActionExecute
+    end
+  end
+  object ImageList1: TImageList
+    Source = <>
+    Destination = <>
+    Left = 232
+    Top = 200
   end
 end

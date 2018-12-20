@@ -217,9 +217,12 @@ begin
         if not Assigned(LField) then begin
           LClass := TStubClass.Create(AParentClass, LJsonPair.JsonString.Value, Self);
           TStubObjectField.Create(AParentClass, LJsonPair.JsonString.Value, LClass);
-        end else
-          LClass := LField.FParentClass;
-        ProcessJsonObject(LJsonVal, LClass);
+        end else begin
+          if LField is TStubContainerField then
+            LClass := TStubContainerField(LField).FieldClass;
+        end;
+        if Assigned(LClass) then
+          ProcessJsonObject(LJsonVal, LClass);
       end;
 
       jtArray:
@@ -634,7 +637,7 @@ end;
 procedure TPkgJsonMapper.Parse(AJsonString: string; ARootClassName: string);
 var
   LJsonValue,
-  LJsonValue2: TJSONValue;
+  LJsonValue2, LJsonItem: TJSONValue;
   LJsonType: TJsonType;
   LClass: TStubClass;
 begin
@@ -654,19 +657,24 @@ begin
 
         jtArray:
         begin
-          LJsonType := jtUnknown;
           LClass := nil;
+          LJsonType := jtUnknown;
 
           LJsonValue2 := GetFirstArrayItem(LJsonValue);
           if LJsonValue2 <> nil then
           begin
             LJsonType := GetJsonType(LJsonValue2);
-            LClass := TStubClass.Create(FRootClass, 'Item', self);
+            LClass := TStubClass.Create(FRootClass, 'Item', Self);
           end;
-          if LJsonType<>jtUnknown then
+          if LJsonType <> jtUnknown then
           begin
             TStubArrayField.Create(FRootClass, 'Items', LJsonType, LClass);
-            ProcessJsonObject(LJsonValue2, LClass);
+            if LJsonType = jtObject then
+            begin
+              for LJsonItem in TJsonArray(LJsonValue) do
+                ProcessJsonObject(LJsonItem, LClass);
+            end else
+              ProcessJsonObject(LJsonValue2, LClass);
           end;
         end;
       end;

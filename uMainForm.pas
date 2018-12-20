@@ -9,7 +9,7 @@ uses
   regularexpressions, generics.collections, Pkg.Json.Mapper, NetEncoding,
   FMX.Menus, FMX.Controls.Presentation, FMX.Edit, FMX.ConstrainedForm, REST.Client,
   uUpdate, System.Threading, uGitHub, FMX.Objects, uUpdateForm, SyncObjs,
-  FMX.ScrollBox, System.Actions, FMX.ActnList, FMX.StdActns;
+  FMX.ScrollBox, System.Actions, FMX.ActnList, FMX.StdActns, System.ImageList, FMX.ImgList;
 
 const
   JsonValidatorUrl = 'http://jsonlint.com';
@@ -52,6 +52,10 @@ type
     rbDelphiJSON: TRadioButton;
     rbGrijjy: TRadioButton;
     rbXSuperObject: TRadioButton;
+    miLoadJSON: TMenuItem;
+    ImageList1: TImageList;
+    LoadJSONAction: TAction;
+    OpenDialog: TOpenDialog;
     procedure btnVisualizeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -70,6 +74,7 @@ type
     procedure Panel1Resize(Sender: TObject);
     procedure PrettyPrintActionExecute(Sender: TObject);
     procedure JSONValidateActionExecute(Sender: TObject);
+    procedure LoadJSONActionExecute(Sender: TObject);
     {$ENDREGION}
   private
     procedure DisableMenuItems;
@@ -97,7 +102,9 @@ implementation
 
 {$R *.fmx}
 
-uses uSaveUnitForm,
+uses
+  System.IOUtils,
+  uSaveUnitForm,
 {$IFDEF MSWINDOWS}
   Winapi.ShellAPI, Winapi.Windows;
 {$ENDIF MSWINDOWS}
@@ -414,8 +421,7 @@ begin
     tv.Selected.IsExpanded := not tv.Selected.IsExpanded;
 end;
 
-procedure TMainForm.tvKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
-  Shift: TShiftState);
+procedure TMainForm.tvKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
 begin
   if ((KeyChar = #0) AND (Key = 113)) AND (tv.Selected <> nil) then
   begin
@@ -426,7 +432,6 @@ begin
     else
       MenuItem3Click(MenuItem3);
   end;
-
 end;
 
 procedure TMainForm.VisualizeClass;
@@ -439,6 +444,18 @@ begin
   //  Workarround for QC129540
   Panel1.Width := Panel1.Width + 1;
   Panel1.Width := Panel1.Width - 1;
+end;
+
+procedure TMainForm.LoadJSONActionExecute(Sender: TObject);
+begin
+  if OpenDialog.Execute then begin
+    Memo1.Lines.BeginUpdate;
+    try
+      Memo1.Lines.LoadFromFile(OpenDialog.FileName);
+    finally
+      Memo1.Lines.EndUpdate;
+    end;
+  end;
 end;
 
 end.

@@ -119,6 +119,7 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <BT_BuildType>Debug</BT_BuildType>
         <DCC_ExeOutput>.\</DCC_ExeOutput>
+        <DCC_DebugDCUs>false</DCC_DebugDCUs>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
@@ -182,6 +183,8 @@
                     <Source Name="MainSource">JsonToDelphiClass.dpr</Source>
                 </Source>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Randy\Documents\Embarcadero\Studio\19.0\Bpl\dclIntraweb_15_D10_2.bpl">File C:\Users\Randy\Documents\Embarcadero\Studio\19.0\Bpl\dclIntraweb_15_D10_2.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Randy\Documents\Embarcadero\Studio\19.0\Bpl\dclIWBootstrapD102.bpl">File C:\Users\Randy\Documents\Embarcadero\Studio\19.0\Bpl\dclIWBootstrapD102.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>

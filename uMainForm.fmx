@@ -1772,6 +1772,7 @@ object MainForm: TMainForm
         Action = JSONValidateAction
         Align = Right
         Enabled = True
+        Images = ImageList1
         ImageIndex = -1
         Margins.Right = 9.000000000000000000
         Position.X = 201.000000000000000000
@@ -1880,6 +1881,11 @@ object MainForm: TMainForm
   object MemoPopupMenu: TPopupMenu
     Left = 272
     Top = 32
+    object miLoadJSON: TMenuItem
+      Action = LoadJSONAction
+      Enabled = True
+      ImageIndex = -1
+    end
     object MenuItem4: TMenuItem
       Action = PrettyPrintAction
       Enabled = True
@@ -1891,7 +1897,17 @@ object MainForm: TMainForm
       ImageIndex = -1
     end
   end
+  object OpenDialog: TOpenDialog
+    DefaultExt = 'json'
+    Filter = 
+      'JSON Files|*.json|JSON Files|*.jsn|JSON Text Files|*.txt|Any tex' +
+      't file|*.*'
+    Title = 'Load JSON File'
+    Left = 192
+    Top = 256
+  end
   object JSONActions: TActionList
+    Images = ImageList1
     Left = 195
     Top = 143
     object PrettyPrintAction: TAction
@@ -1908,5 +1924,16 @@ object MainForm: TMainForm
       Category = 'Edit'
       Text = 'On-Screen Keyboard'
     end
+    object LoadJSONAction: TAction
+      Category = 'JSONEditor'
+      Text = 'Load JSON'
+      OnExecute = LoadJSONActionExecute
+    end
+  end
+  object ImageList1: TImageList
+    Source = <>
+    Destination = <>
+    Left = 232
+    Top = 200
   end
 end

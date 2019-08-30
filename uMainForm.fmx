@@ -1543,8 +1543,8 @@ object MainForm: TMainForm
       TabOrder = 0
       OnDblClick = tvDblClick
       OnKeyDown = tvKeyDown
-      Viewport.Width = 333.000000000000000000
-      Viewport.Height = 507.000000000000000000
+      Viewport.Width = 329.000000000000000000
+      Viewport.Height = 503.000000000000000000
     end
     object Label3: TLabel
       Align = Top
@@ -1699,6 +1699,34 @@ object MainForm: TMainForm
         
           '    "zipball_url": "https://api.github.com/repos/PKGeorgiev/Delp' +
           'hi-JsonToDelphiClass/zipball/0.64",'
+        '    "events": ['
+        
+          '      {"EventName": "Calving","EventDate": "2011-08-05","Metadat' +
+          'a": {"Calvingease": "1"}},'
+        
+          '      {"EventName": "Calving","EventDate": "2012-01-18","Metadat' +
+          'a": {"Calvingease": "4"}},'
+        
+          '      {"EventName": "Insemination","EventDate": "2010-09-23","Me' +
+          'tadata": {"Inseminationnumber": "1","Bullidentifier": "511HO0796' +
+          '5","Technician": "7"}},'
+        
+          '      {"EventName": "Insemination","EventDate": "2010-10-11","Me' +
+          'tadata": {"Inseminationnumber": "2","Bullidentifier": "011HO0970' +
+          '3","Technician": "7"}},'
+        
+          '      {"EventName": "Insemination","EventDate": "2010-10-31","Me' +
+          'tadata": {"Inseminationnumber": "3","Bullidentifier": "200HO0740' +
+          '5","Technician": "7"}},'
+        
+          '      {"EventName": "Insemination","EventDate": "2011-10-21","Me' +
+          'tadata": {"Inseminationnumber": "1","Bullidentifier": "011HO1090' +
+          '8","Technician": "38"}},'
+        
+          '      {"EventName": "Insemination","EventDate": "2014-11-03","Me' +
+          'tadata": {"Inseminationnumber": "1","Bullidentifier": "011HO1143' +
+          '6","Technician": "12"}}'
+        '    ],'
         '    "body": "Initial Public Release."'
         '  }'
         ']')
@@ -1713,8 +1741,8 @@ object MainForm: TMainForm
       StyleLookup = 'Memo1Style1'
       TabOrder = 0
       OnDblClick = Memo1DblClick
-      Viewport.Width = 657.000000000000000000
-      Viewport.Height = 448.000000000000000000
+      Viewport.Width = 637.000000000000000000
+      Viewport.Height = 428.000000000000000000
     end
     object Panel3: TPanel
       Align = Bottom
@@ -1774,7 +1802,7 @@ object MainForm: TMainForm
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
-          Text = 'RootUnit'
+          Text = 'JsonClass'
           Position.X = 3.000000000000000000
           Position.Y = 17.000000000000000000
           Size.Width = 182.000000000000000000

@@ -1736,13 +1736,13 @@ object MainForm: TMainForm
       Margins.Bottom = 6.000000000000000000
       PopupMenu = MemoPopupMenu
       Size.Width = 657.000000000000000000
-      Size.Height = 448.000000000000000000
+      Size.Height = 438.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'Memo1Style1'
       TabOrder = 0
       OnDblClick = Memo1DblClick
       Viewport.Width = 637.000000000000000000
-      Viewport.Height = 428.000000000000000000
+      Viewport.Height = 418.000000000000000000
     end
     object Panel3: TPanel
       Align = Bottom
@@ -1751,9 +1751,9 @@ object MainForm: TMainForm
       Padding.Right = 6.000000000000000000
       Padding.Bottom = 6.000000000000000000
       Position.X = 6.000000000000000000
-      Position.Y = 473.000000000000000000
+      Position.Y = 463.000000000000000000
       Size.Width = 657.000000000000000000
-      Size.Height = 53.000000000000000000
+      Size.Height = 63.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
       object btnVisualize: TButton
@@ -1762,7 +1762,7 @@ object MainForm: TMainForm
         Position.X = 337.000000000000000000
         Position.Y = 6.000000000000000000
         Size.Width = 63.000000000000000000
-        Size.Height = 41.000000000000000000
+        Size.Height = 51.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         Text = 'Visualize'
@@ -1778,7 +1778,7 @@ object MainForm: TMainForm
         Position.X = 201.000000000000000000
         Position.Y = 6.000000000000000000
         Size.Width = 127.000000000000000000
-        Size.Height = 41.000000000000000000
+        Size.Height = 51.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 2
         Text = 'Validate JSON string'
@@ -1787,7 +1787,7 @@ object MainForm: TMainForm
         Align = Client
         Margins.Right = 6.000000000000000000
         Size.Width = 189.000000000000000000
-        Size.Height = 41.000000000000000000
+        Size.Height = 51.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'Panel4Style1'
         TabOrder = 5
@@ -1817,7 +1817,7 @@ object MainForm: TMainForm
         Position.X = 555.000000000000000000
         Position.Y = 6.000000000000000000
         Size.Width = 87.000000000000000000
-        Size.Height = 41.000000000000000000
+        Size.Height = 51.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
         Text = 'Preview Unit'
@@ -1829,7 +1829,7 @@ object MainForm: TMainForm
         Position.X = 409.000000000000000000
         Position.Y = 6.000000000000000000
         Size.Width = 140.000000000000000000
-        Size.Height = 41.000000000000000000
+        Size.Height = 51.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'Panel4Style1'
         TabOrder = 6
@@ -1837,21 +1837,20 @@ object MainForm: TMainForm
           GroupName = 'JsonLib'
           IsChecked = True
           Position.X = 10.000000000000000000
-          Position.Y = -5.000000000000000000
           TabOrder = 2
           Text = 'Delphi JSON'
         end
         object rbGrijjy: TRadioButton
           GroupName = 'JsonLib'
           Position.X = 10.000000000000000000
-          Position.Y = 11.000000000000000000
+          Position.Y = 16.000000000000000000
           TabOrder = 1
           Text = 'Grijjy Foundation'
         end
         object rbXSuperObject: TRadioButton
           GroupName = 'JsonLib'
           Position.X = 10.000000000000000000
-          Position.Y = 27.000000000000000000
+          Position.Y = 32.000000000000000000
           TabOrder = 0
           Text = 'XSuperObject'
         end

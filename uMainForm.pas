@@ -120,7 +120,7 @@ begin
   self.Constraints.MinWidth := 1024;
   self.Constraints.MinHeight := 560;
 
-  Caption := 'JsonToDelphiClass - ' + FloatToStr(ProgramVersion, PointDsFormatSettings){ + ' | By Petar Georgiev'};
+  Caption := 'JsonToDelphiClass - ' + FloatToStr(ProgramVersion, PointDsFormatSettings) {+ ' | By Petar Georgiev'};
 
   jm := TPkgJsonMapper.Create(tv);
 

@@ -26,6 +26,8 @@ type
     FFieldType: TJsonType;
     FParentClass: TStubClass;
     procedure SetName(const Value: string);
+    function GetCorrectedName: string;
+    function GetAddNameAttrib: boolean;
   public
     constructor Create(AParentClass: TStubClass; AItemName: string; AFieldType: TJsonType);
     destructor Destroy; override;
@@ -33,9 +35,11 @@ type
     class function GetTypeAsString(AType: TJsonType): string; overload;
 
     property Name: string read FName write SetName;
+    property CorrectedName: string read GetCorrectedName;
     property FieldName: string read FFieldName write FFieldName;
     property PropertyName: string read FPropertyName write FPropertyName;
     property FieldType: TJsonType read FFieldType write FFieldType;
+    property AddNameAttrib: boolean read GetAddNameAttrib;
   end;
 
   TStubContainerField = class(TStubField)
@@ -75,14 +79,16 @@ type
     procedure SortFields;
     procedure SetName(const Value: string);
     procedure SetPureClassName(const Value: string);
+    function GetCorrectedName: string;
   public
     constructor Create(AParentClass: TStubClass; AClassName: string; AMapper: TPkgJsonMapper);
     destructor Destroy; override;
-    function GetDeclarationPart(IncludeSerializers: Boolean = False): string;
+    function GetDeclarationPart(IncludeSerializers: Boolean; JsonLibrary: TJsonLibrary): string;
     function GetImplementationPart(AJsonLibrary: TJsonLibrary; IncludeSerializers: Boolean = False): string;
     function FindField(AFieldName: string): TStubField;
 
     property Name: string read FName write SetName;
+    property CorrectedName: string read GetCorrectedName;
     property Items: TList<TStubField> read FItems write FItems;
     property PureClassName: string read FPureClassName write SetPureClassName;
   end;
@@ -304,7 +310,7 @@ begin
     for k := FClasses.Count - 1 downto 0 do
     begin
       LClass := FClasses[k];
-      LList.Add(LClass.GetDeclarationPart(k = 0).TrimRight);
+      LList.Add(LClass.GetDeclarationPart(k = 0, JsonLibrary).TrimRight);
       LList.Add('');
     end;
 
@@ -620,13 +626,13 @@ begin
     case LField.FieldType of
       jtObject:
       begin
-        LItem.Text := LField.Name + ': {} ' + LField.GetTypeAsString;
+        LItem.Text := LField.CorrectedName + ': {} ' + LField.GetTypeAsString;
         InternalVisualize(LItem, (LField as TStubObjectField).FieldClass, AItemStyleLookup);
       end;
 
       jtArray:
       begin
-        LItem.Text := LField.Name + ': [] ' + LField.GetTypeAsString;
+        LItem.Text := LField.CorrectedName + ': [] ' + LField.GetTypeAsString;
         if (LField as TStubArrayField).ContainedType = jtObject then
         begin
           InternalVisualize(LItem, (LField as TStubArrayField).FieldClass, AItemStyleLookup);
@@ -635,7 +641,7 @@ begin
 
       else
       begin
-        LItem.Text := LField.Name + ': ' + LField.GetTypeAsString;
+        LItem.Text := LField.CorrectedName + ': ' + LField.GetTypeAsString;
       end;
     end;
 
@@ -801,7 +807,7 @@ begin
         LLines.Add('var');
         for LItem in FArrayItems do
         begin
-          LString := Format('  %sItem: %s;', [LItem.FName, (LItem as TStubContainerField).FFieldClass.Name]);
+          LString := Format('  %sItem: %s;', [LItem.FName, (LItem as TStubContainerField).FFieldClass.CorrectedName]);
           LLines.Add(LString);
         end;
       end;
@@ -869,7 +875,11 @@ procedure TStubClass.SetName(const Value: string);
 var
   LName: string;
 begin
-  FPureClassName := string(Copy(Value, 1, 1)).ToUpper + Copy(Value, 2);
+  FPureClassName := Value;
+  if FPureClassName.Chars[0] = '@' then
+    Delete(FPureClassName, 1, 1); // handle @context item
+
+  FPureClassName := string(UpCase(FPureClassName.Chars[0])) + FPureClassName.Substring(1);
 
   if FPureClassName.EndsWith('s') then // remove plural element
     SetLength(FPureClassName, FPureClassName.Length - 1);
@@ -884,12 +894,19 @@ begin
   FPureClassName := Value;
 end;
 
+function TStubClass.GetCorrectedName: string;
+begin
+  Result := Name;
+  if Result.Chars[0] = '@' then
+    Delete(Result, 1, 1); // handle @context item
+end;
+
 procedure TStubClass.SortFields;
 begin
   // FItems.Sort(FComparer);
 end;
 
-function TStubClass.GetDeclarationPart(IncludeSerializers: Boolean = False): string;
+function TStubClass.GetDeclarationPart(IncludeSerializers: Boolean; JsonLibrary: TJsonLibrary): string;
 var
   LLines: TStringList;
   LString: string;
@@ -931,6 +948,15 @@ begin
     begin
       if (LItem.FieldType = jtUnknown) OR ((LItem is TStubContainerField) AND ((LItem as TStubContainerField).ContainedType = jtUnknown)) then
         raise EJsonMapper.CreateFmt('The property [%s] has unknown type!', [LItem.PropertyName]);
+
+      if LItem.AddNameAttrib then begin
+        case JsonLibrary of
+          jlDelphi: LString := '[JsonName(''%s'')]';
+          jlGrijjy: LString := '[BsonElement(''%s'')]';
+          jlXSuper: LString := '[alias(''%s'')]';
+        end;
+        LLines.Add('    ' + Format(LString, [LItem.Name]));
+      end;
 
       LString := Format('  property %s: %s read %s write %s;', [LItem.PropertyName, LItem.GetTypeAsString, LItem.FieldName, LItem.FieldName]);
       LLines.Add('  ' + LString);
@@ -989,18 +1015,33 @@ procedure TStubField.SetName(const Value: string);
 begin
   FName := Value;
 
-  FFieldName := 'F' + String(Copy(Value, 1, 1)).ToUpper + Copy(Value, 2);
+  FFieldName := Value;
+  if FFieldName.Chars[0] = '@' then
+    Delete(FFieldName, 1, 1); // handle @context fields
 
-  if ReservedWords.Contains(Value.ToLower) then
-    FPropertyName := '&' + Value
+  if ReservedWords.Contains(FFieldName.ToLower) then
+    FPropertyName := '&' + FFieldName
   else
-    FPropertyName := Value;
+    FPropertyName := FFieldName;
 
+  FFieldName := 'F' + string(UpCase(FFieldName.Chars[0])) + FFieldName.Substring(1); // Copy(Value, 2);
 end;
 
 function TStubField.GetTypeAsString: string;
 begin
   Result := GetTypeAsString(FFieldType);
+end;
+
+function TStubField.GetCorrectedName: string;
+begin
+  Result := Name;
+  if Result.Chars[0] = '@' then
+    Delete(Result, 1, 1); // handle @context item
+end;
+
+function TStubField.GetAddNameAttrib: boolean;
+begin
+  Result := Name <> CorrectedName;
 end;
 
 { TArrayItem }

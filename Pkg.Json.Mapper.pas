@@ -881,7 +881,11 @@ begin
 
   FPureClassName := string(UpCase(FPureClassName.Chars[0])) + FPureClassName.Substring(1);
 
-  if FPureClassName.EndsWith('s') then // remove plural element
+  if FPureClassName.EndsWith('ies') then begin // remove plural element Summaries becomes Summary
+    SetLength(FPureClassName, FPureClassName.Length - 2);
+    FPureClassName[Length(FPureClassName)] := 'y';
+  end
+  else if FPureClassName.EndsWith('s') then // remove plural element
     SetLength(FPureClassName, FPureClassName.Length - 1);
 
   LName := 'T' + FPureClassName {+ 'Class'};

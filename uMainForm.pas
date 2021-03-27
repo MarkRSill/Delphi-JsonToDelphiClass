@@ -438,8 +438,16 @@ procedure TMainForm.VisualizeClass;
 begin
   FChanged := false;
 
-  jm.Parse(memo1.Text, 'Root');
-  jm.Visualize(tv, 'TreeViewItem1Style1');
+  if not memo1.Text.IsEmpty then begin
+    jm.Parse(memo1.Text, 'Root');
+    jm.Visualize(tv, 'TreeViewItem1Style1');
+  end else begin
+    if OpenDialog.Execute then begin
+      jm.Parse(TFile.ReadAllText(OpenDialog.FileName), 'Root');
+      jm.Visualize(tv, 'TreeViewItem1Style1');
+      Memo1.Lines.LoadFromFile(OpenDialog.FileName);
+    end;
+  end;
 
   //  Workarround for QC129540
   Panel1.Width := Panel1.Width + 1;
